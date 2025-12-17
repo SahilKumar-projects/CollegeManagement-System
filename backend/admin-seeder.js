@@ -1,60 +1,32 @@
-const adminDetails = require("./models/details/admin-details.model");
-const connectToMongo = require("./database/db");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const AdminDetails = require("./models/details/admin-details.model");
 
-const seedData = async () => {
+mongoose.connect(process.env.MONGO_URI);
+
+async function seedAdmin() {
   try {
-    await connectToMongo();
+    await AdminDetails.deleteMany({});
 
-    // Clear existing admin data
-    await adminDetails.deleteMany({});
+    const hashedPassword = await bcrypt.hash("admin123", 10);
 
-    const password = "admin123";
-    const employeeId = 123456;
-
-    const adminDetail = {
-      employeeId: employeeId,
-      firstName: "Sundar",
-      middleName: "R",
-      lastName: "Pichai",
+    await AdminDetails.create({
       email: "admin@gmail.com",
+      password: hashedPassword,
+      firstName: "Admin",
+      lastName: "User",
       phone: "1234567890",
-      profile: "Faculty_Profile_123456.jpg",
-      address: "123 College Street",
-      city: "College City",
-      state: "State",
-      pincode: "123456",
-      country: "India",
       gender: "male",
-      dob: new Date("1990-01-01"),
-      designation: "System Administrator",
-      joiningDate: new Date(),
-      salary: 50000,
       status: "active",
       isSuperAdmin: true,
-      emergencyContact: {
-        name: "Emergency Contact",
-        relationship: "Spouse",
-        phone: "9876543210",
-      },
-      bloodGroup: "O+",
-      password: password,
-    };
+    });
 
-    await adminDetails.create(adminDetail);
-
-    console.log("\n=== Admin Credentials ===");
-    console.log("Employee ID:", employeeId);
-    console.log("Password:", password);
-    console.log("Email:", adminDetail.email);
-    console.log("=======================\n");
-    console.log("Seeding completed successfully!");
-  } catch (error) {
-    console.error("Error while seeding:", error);
-  } finally {
-    await mongoose.connection.close();
-    process.exit();
+    console.log("✅ Admin created successfully");
+    process.exit(0);
+  } catch (err) {
+    console.error("❌ Seeder error:", err);
+    process.exit(1);
   }
-};
+}
 
-seedData();
+seedAdmin();
