@@ -10,9 +10,15 @@ const port = process.env.PORT || 4000;
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_API_LINK || "*",
+    origin: [
+      "http://localhost:3000",
+      "https://college-management-system-git-main-sahilkumar-projects-projects.vercel.app"
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    credentials: true,
   })
 );
+
 
 app.use(express.json());
 
