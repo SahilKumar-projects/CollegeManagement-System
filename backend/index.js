@@ -12,12 +12,17 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://college-management-system-git-main-sahilkumar-projects-projects.vercel.app"
+      "https://college-management-system-peach.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
+
+// ✅ IMPORTANT: handle preflight requests
+app.options("*", cors());
+
 
 
 app.use(express.json());

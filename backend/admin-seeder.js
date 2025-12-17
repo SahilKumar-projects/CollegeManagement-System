@@ -1,32 +1,55 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const AdminDetails = require("./models/details/admin-details.model");
-
-mongoose.connect(process.env.MONGO_URI);
+const Admin = require("./models/details/admin-details.model");
 
 async function seedAdmin() {
   try {
-    await AdminDetails.deleteMany({});
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("✅ MongoDB connected");
 
-    const hashedPassword = await bcrypt.hash("admin123", 10);
+    const existing = await Admin.findOne({ email: "admin@gmail.com" });
+    if (existing) {
+      console.log("⚠️ Admin already exists");
+      process.exit();
+    }
 
-    await AdminDetails.create({
-      email: "admin@gmail.com",
-      password: hashedPassword,
+    const admin = new Admin({
+      employeeId: 123456,
       firstName: "Admin",
       lastName: "User",
-      phone: "1234567890",
+      email: "admin@gmail.com",
+      phone: "9999999999",
+      address: "Main Admin Office",
+      city: "Delhi",
+      state: "Delhi",
+      pincode: "110001",
+      country: "India",
       gender: "male",
-      status: "active",
+      dob: new Date("1990-01-01"),
+      designation: "System Administrator",
+      joiningDate: new Date(),
+      salary: 50000,
       isSuperAdmin: true,
+      bloodGroup: "O+",
+      emergencyContact: {
+        name: "Emergency",
+        relationship: "Self",
+        phone: "9999999999",
+      },
+      password: "admin123", // 🔐 will be hashed automatically
     });
 
+    await admin.save();
     console.log("✅ Admin created successfully");
-    process.exit(0);
+
+    process.exit();
   } catch (err) {
     console.error("❌ Seeder error:", err);
     process.exit(1);
   }
 }
+const dbName = mongoose.connection.name;
+console.log("🧠 Connected DB:", dbName);
+
 
 seedAdmin();
