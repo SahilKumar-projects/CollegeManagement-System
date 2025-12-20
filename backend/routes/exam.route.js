@@ -6,12 +6,17 @@ const {
   deleteExamController,
 } = require("../controllers/exam.controller");
 const auth = require("../middlewares/auth.middleware");
-const router = express.Router();
 const upload = require("../middlewares/multer.middleware");
 
+const router = express.Router();
+
 router.get("/", auth, getAllExamsController);
-router.post("/", auth, upload.single("file"), addExamController);
-router.patch("/:id", auth, upload.single("file"), updateExamController);
+
+// ✅ field name MATCHES controller & frontend
+router.post("/", auth, upload.single("timetableLink"), addExamController);
+router.patch("/:id", auth, upload.single("timetableLink"), updateExamController);
+
 router.delete("/:id", auth, deleteExamController);
 
 module.exports = router;
+

@@ -129,14 +129,14 @@ const Faculty = () => {
       let response;
       if (isEditing) {
         response = await axiosWrapper.patch(
-          `/faculty/${selectedFacultyId}`,
+          `/auth/faculty/${selectedFacultyId}`,
           formData,
           {
             headers,
           }
         );
       } else {
-        response = await axiosWrapper.post(`/faculty/register`, formData, {
+        response = await axiosWrapper.post(`auth/faculty/register`, formData, {
           headers,
         });
       }

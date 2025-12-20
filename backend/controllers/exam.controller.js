@@ -3,59 +3,91 @@ const ApiResponse = require("../utils/ApiResponse");
 
 const getAllExamsController = async (req, res) => {
   try {
-    const { search = "", examType = "", semester = "" } = req.query;
+    const { examType, semester } = req.query;
 
-    let query = {};
-
-    if (semester) query.semester = semester;
+    const query = {};
+    if (semester) query.semester = Number(semester);
     if (examType) query.examType = examType;
 
     const exams = await Exam.find(query);
 
-    if (!exams || exams.length === 0) {
-      return ApiResponse.error("No Exams Found", 404).send(res);
+    if (!exams.length) {
+      return ApiResponse.notFound("No Exams Found").send(res);
     }
 
     return ApiResponse.success(exams, "All Exams Loaded!").send(res);
   } catch (error) {
-    return ApiResponse.error(error.message).send(res);
+    console.error("Get Exam Error:", error);
+    return ApiResponse.internalServerError(error.message).send(res);
   }
 };
 
 const addExamController = async (req, res) => {
   try {
-    const formData = req.body;
-    if (req.file) {
-      formData.timetableLink = req.file.filename;
+    const { name, date, semester, examType, totalMarks } = req.body;
+
+    // ✅ VALIDATION
+    if (!name || !date || !semester || !examType || !totalMarks) {
+      return ApiResponse.badRequest("All fields are required").send(res);
     }
-    const exam = await Exam.create(formData);
-    return ApiResponse.success(exam, "Exam Added Successfully!").send(res);
+
+    if (!req.file) {
+      return ApiResponse.badRequest("Timetable file is required").send(res);
+    }
+
+    const exam = await Exam.create({
+      name,
+      date,
+      semester: Number(semester),
+      examType,
+      totalMarks: Number(totalMarks),
+      timetableLink: req.file.filename,
+    });
+
+    return ApiResponse.created(exam, "Exam Added Successfully!").send(res);
   } catch (error) {
-    return ApiResponse.error(error.message).send(res);
+    console.error("Add Exam Error:", error);
+    return ApiResponse.internalServerError(error.message).send(res);
   }
 };
 
 const updateExamController = async (req, res) => {
   try {
-    const formData = req.body;
+    const updateData = { ...req.body };
+
     if (req.file) {
-      formData.timetableLink = req.file.filename;
+      updateData.timetableLink = req.file.filename;
     }
-    const exam = await Exam.findByIdAndUpdate(req.params.id, formData, {
-      new: true,
-    });
+
+    const exam = await Exam.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    if (!exam) {
+      return ApiResponse.notFound("Exam not found").send(res);
+    }
+
     return ApiResponse.success(exam, "Exam Updated Successfully!").send(res);
   } catch (error) {
-    return ApiResponse.error(error.message).send(res);
+    console.error("Update Exam Error:", error);
+    return ApiResponse.internalServerError(error.message).send(res);
   }
 };
 
 const deleteExamController = async (req, res) => {
   try {
     const exam = await Exam.findByIdAndDelete(req.params.id);
-    return ApiResponse.success(exam, "Exam Deleted Successfully!").send(res);
+
+    if (!exam) {
+      return ApiResponse.notFound("Exam not found").send(res);
+    }
+
+    return ApiResponse.success(null, "Exam Deleted Successfully").send(res);
   } catch (error) {
-    return ApiResponse.error(error.message).send(res);
+    console.error("Delete Exam Error:", error);
+    return ApiResponse.internalServerError(error.message).send(res);
   }
 };
 

@@ -3,39 +3,42 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const cors = require("cors");
+const fs = require("fs");
+
+
+const mediaPath = path.join(__dirname, "media");
+if (!fs.existsSync(mediaPath)) {
+  fs.mkdirSync(mediaPath, { recursive: true });
+}
+
 
 connectToMongo();
 
-const port = process.env.PORT || 4000;
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://college-management-system-peach.vercel.app",
-    ],
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: "*",
     credentials: true,
   })
 );
 
-// ✅ IMPORTANT: handle preflight requests
+// Handle preflight requests
 app.options("*", cors());
-
-
 
 app.use(express.json());
 
+
 app.get("/", (req, res) => {
-  res.send("Hello 👋 I am Working Fine 🚀");
+  res.send("Hello 👋 Backend is running successfully 🚀");
 });
 
-app.use("/media", express.static(path.join(__dirname, "media")));
+app.use("/media", express.static(mediaPath));
+
 
 app.use("/api/auth/admin", require("./routes/details/admin-details.route"));
 app.use("/api/auth/faculty", require("./routes/details/faculty-details.route"));
 app.use("/api/auth/student", require("./routes/details/student-details.route"));
+
 
 app.use("/api/branch", require("./routes/branch.route"));
 app.use("/api/subject", require("./routes/subject.route"));
@@ -45,6 +48,9 @@ app.use("/api/material", require("./routes/material.route"));
 app.use("/api/exam", require("./routes/exam.route"));
 app.use("/api/marks", require("./routes/marks.route"));
 
+
+const port = process.env.PORT || 4000;
+
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`✅ Server running on port ${port}`);
 });
