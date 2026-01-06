@@ -104,19 +104,19 @@ Start Frontend Server: npm start
 
 ## Project Screenshots
 
- Login Page
+ ### Login Page
 ![Login Page](assets/admin-login.JPG)
 
- Admin Dashboard
+### Admin Dashboard
 ![Admin Dashboard](assets/admin-dashboard.JPG)
 
- Faculty Management
+### Faculty Management
 ![Faculty Management](assets/facultyManagement.JPG)
 
- Student Management
+### Student Management
 ![Notice Page](assets/student-management.JPG)
 
- Branch details
+### Branch details
 ![Add Faculty](assets/BranchDetails.JPG)
 
 
